@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <style>
+            body{
+                font-size:20px;
+            }
+            h1{
+                text-align:center;
+            }
+            .wrapper{
+                margin:40px auto;
+            }
+            .wordRow{
+                border-top:1px solid blue;
+                background-color:lightblue;
+                padding:3px;
+                margin:0;
+                text-align:center;
+                
+            }
+            .wordLetterBox{
+                border:1px solid black;
+                padding:3px;
+                margin:3px;
+                background-color:white;
+                width:1.5em;
+                height:1.5em;
+                text-align:center;
+                font-size:1em;
+                font-weight:heavy;
+                text-align:center;
+                text-transform: uppercase;
+            }
+            .contains{
+                background-color:orange;
+            }
+            .notContains{
+                background-color:grey;
+            }
+            .correct{
+                background-color:lightgreen;
+            }
+        </style>
+
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                console.log('DOM fully loaded and parsed');
+                console.log("start a new word game!");
+                wordGame.play();
+            });
+
+            var wordGame = {
+              possibleWords: [
+                "hello",
+                "world",
+                "close",
+                "codes",
+                "clear",
+                "house",
+                "mouse",
+                "learn",
+                "error",
+                "basic",
+                "exist",
+                "exits",
+              ],
+              currentWord: "",
+              rowCount: 0,
+              play: function () {
+                console.log("play game has been called");
+                addEventListener("input", (event) => {
+                  if (event.target.id != 0) {
+                    let selectedInput = document.getElementById(
+                      event.target.id
+                    );
+                    selectedInput.readOnly = true;
+                    selectedInput.nextElementSibling != null &&
+                      selectedInput.nextElementSibling.focus();
+                    wordGame.testIsRowComplete(selectedInput.parentElement.id);
+                  }
+                });
+
+                wordGame.currentWord =
+                  wordGame.possibleWords[Math.floor(Math.random() * wordGame.possibleWords.length)];
+                console.log("DEBUG: Secret word is: " + wordGame.currentWord);
+
+                wordGame.createRow();
+              },
+
+              createRow: function () {
+                let wordRow = document.getElementById("wrapper");
+
+                wordGame.rowCount =
+                  document.getElementsByClassName("wordRow").length + 1;
+
+                let row = document.createElement("div");
+                row.className = "wordRow";
+                row.id = wordGame.rowCount;
+
+                for (let i = 0; i < 5; i++) {
+                  let inputBox = document.createElement("input");
+                  inputBox.id =
+                    "inputbox_row_" + wordGame.rowCount + "_box_" + i;
+                  inputBox.className = "wordLetterBox";
+                  inputBox.maxLength = 1;
+                  row.appendChild(inputBox);
+                }
+
+                wordRow.appendChild(row);
+                console.log("Create a row called");
+              },
+
+              testIsRowComplete: function (rowNumber) {
+                let selectedRow = document.getElementById(rowNumber);
+                let isRowFull = true;
+
+                for (let i = 0; i < selectedRow.children.length; i++) {
+                  if (selectedRow.children[i].value == 0) {
+                    isRowFull = false;
+                  }
+                }
+
+                if (isRowFull) {
+                  wordGame.checkRowLetters(rowNumber);
+                  selectedRow.children.readOnly = true;
+                }
+
+                console.log("Test row complete called");
+              },
+
+              checkRowLetters: function (rowNumber) {
+                console.log("Check row letters called on row " + rowNumber);
+
+                let selectedRow = document.getElementById(rowNumber);
+
+                let gameWon = true;
+
+                for (let i = 0; i < selectedRow.children.length; i++) {
+                  if (wordGame.currentWord[i] == selectedRow.children[i].value) {
+                    selectedRow.children[i].className = "wordLetterBox correct";
+                  } else if (wordGame.currentWord.includes(selectedRow.children[i].value)) {
+                    selectedRow.children[i].className = "wordLetterBox contains";
+                    gameWon = false;
+                  } else {
+                    selectedRow.children[i].className = "wordLetterBox notContains";
+                    gameWon = false;
+                  }
+                }
+
+                if (gameWon) {
+                  wordGame.gameWon();
+                } else {
+                  wordGame.createRow();
+                }
+              },
+
+              gameWon: function () {
+                console.log("Game won! player found the word (which was " + wordGame.currentWord + ")");
+                if (confirm("Well done! \nsolved in " +wordGame.rowCount +" attempts \n\nplay again?")) {
+                  location.reload();
+                }
+              },
+            };
+        </script>
+
+    </head>
+    <body>
+        <h1>Find the 5 letter word &hellip;<h1>
+        <div class="wrapper" id="wrapper"></div>
+    </body>
+</html>
